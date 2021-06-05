@@ -21,8 +21,8 @@ class CreateInternsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('duration');
-            $table->json('projects');
-            $table->json('technology');
+            $table->string('projects');
+            $table->string('technology');
             $table->string('qr_path');
 
             $table->timestamps();
