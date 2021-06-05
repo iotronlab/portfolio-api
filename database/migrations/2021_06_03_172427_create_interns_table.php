@@ -23,7 +23,7 @@ class CreateInternsTable extends Migration
             $table->integer('duration');
             $table->string('projects');
             $table->string('technology');
-            $table->string('qr_path');
+            $table->string('qr_path')->nullable();
 
             $table->timestamps();
         });
