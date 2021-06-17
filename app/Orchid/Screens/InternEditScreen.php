@@ -178,8 +178,7 @@ class InternEditScreen extends Screen
             'Content-Type' =>  'image/svg',
 
         ];
-        return (new Response($file, 200))
-            ->header('Content-Type', 'image/svg');
+        return response()->download($path, $intern->uid . '.svg', $headers);
         //FacadesAlert::info('Done');
     }
 
