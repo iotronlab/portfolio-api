@@ -15,7 +15,7 @@ class CreateInternsTable extends Migration
     {
         Schema::create('interns', function (Blueprint $table) {
             $table->id();
-            $table->string('uid');
+            $table->string('uid')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->date('start_date');

@@ -4,6 +4,7 @@ namespace App\Orchid\Screens;
 
 use App\Models\Interns;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Orchid\Alert\Alert;
 use Orchid\Screen\Actions\Button;
@@ -91,6 +92,11 @@ class InternEditScreen extends Screen
     {
         return [
             Layout::rows([
+                Input::make('intern.uid')
+                    ->title('UID')
+                    ->placeholder('Enter Unique ID')
+                    ->help('Certificate Number'),
+
                 Input::make('intern.name')
                     ->title('Name')
                     ->placeholder('Enter your name')
@@ -123,9 +129,7 @@ class InternEditScreen extends Screen
                     ->placeholder('Enter technology'),
             ]),
             Layout::modal('exampleModal', [
-                Layout::rows([
-
-                ]),
+                Layout::rows([]),
             ]),
         ];
     }
@@ -140,7 +144,7 @@ class InternEditScreen extends Screen
     public function createOrUpdate(Interns $intern, Request $request)
     {
         $data = $request->get('intern');
-        $data['uid'] = (string) Str::uuid();
+        //   $data['uid'] = (string) Str::uuid();
         // dd($data);
         $intern->fill($data)->save();
 
@@ -149,20 +153,34 @@ class InternEditScreen extends Screen
         return redirect()->route('platform.intern.list');
     }
 
-    public function qrgenerate(Interns $intern){
-       QrCode::size(800)
-                    ->format('svg')
-                    ->generate('https://cert.iotronlabs.com/intern/'.$intern->uid,'../public/qrcodes/'.$intern->uid.'.svg');
+    public function qrgenerate(Interns $intern)
+    {
 
-        //  $qr_path = Storage::url('')
-        // $intern->update(
-        //     'qr_path' => $qr_path,
-        // );
-        $path =  Storage::path(`$intern->uid.'.svg'`);
-        $url =  Storage::url($path);
-        $qrlink = asset($url);
-        dd($qrlink);
-        FacadesAlert::info('Done');
+        // if ($intern->qr_path != null) {
+        //     return Storage::download($intern->qr_path);
+        // }
+        QrCode::size(800)
+            ->format('svg')
+            ->generate('https://cert.iotronlabs.com/intern/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.svg');
+        // if (Storage::disk('public')->exists('qrcodes/' . $intern->uid . '.svg')) {
+        //     dd($intern);
+        // }
+        //   $intern->setAttribute('Qrcode', 'images/qrcode' . $intern->uid . '.svg');
+        $path = public_path('storage/qrcodes/' . $intern->uid . '.svg');
+
+        $file = Storage::disk('public')->get('qrcodes/' . $intern->uid . '.svg');
+        $intern->update([
+            'qr_path' => $path
+            //  asset('storage/qrcodes/' . $intern->uid . '.svg')
+        ]);
+        $headers = [
+
+            'Content-Type' =>  'image/svg',
+
+        ];
+        return (new Response($file, 200))
+            ->header('Content-Type', 'image/svg');
+        //FacadesAlert::info('Done');
     }
 
 
