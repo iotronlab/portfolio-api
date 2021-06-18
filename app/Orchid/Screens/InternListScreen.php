@@ -2,7 +2,8 @@
 
 namespace App\Orchid\Screens;
 
-use App\Models\Interns;
+use App\Models\Intern;
+
 use App\Orchid\Layouts\InternListLayout;
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
@@ -31,7 +32,7 @@ class InternListScreen extends Screen
     public function query(): array
     {
         return [
-            'interns' => Interns::paginate()
+            'interns' => Intern::paginate()
         ];
     }
 

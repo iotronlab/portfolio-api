@@ -2,7 +2,9 @@
 
 namespace App\Orchid\Screens;
 
+use App\Models\Intern;
 use App\Models\Interns;
+use App\View\Components\internQR;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
@@ -14,9 +16,14 @@ use Orchid\Screen\Screen;
 use Orchid\Support\Facades\Alert as FacadesAlert;
 use Orchid\Support\Facades\Layout;
 use Illuminate\Support\Str;
+use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Actions\ModalToggle;
+use Orchid\Screen\Layouts\Card;
+use Orchid\Screen\Sight;
+use Orchid\Screen\TD;
 use SebastianBergmann\CodeCoverage\Report\Xml\Facade;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use \Imagick;
 
 class InternEditScreen extends Screen
 {
@@ -39,7 +46,7 @@ class InternEditScreen extends Screen
      *
      * @return array
      */
-    public function query(Interns $intern): array
+    public function query(Intern $intern): array
     {
         $this->exists = $intern->exists;
 
@@ -49,7 +56,7 @@ class InternEditScreen extends Screen
         }
 
         return [
-            'intern' => $intern,
+            'intern' => $intern
         ];
     }
 
@@ -79,6 +86,10 @@ class InternEditScreen extends Screen
             Button::make('Generate Qr-code')
                 ->icon('barcode')
                 ->method('qrgenerate')
+                ->canSee($this->exists),
+            Link::make('Download Qr-code')
+                ->icon('barcode')
+                ->route('getQR', 'KIIT1234')
                 ->canSee($this->exists),
         ];
     }
@@ -127,10 +138,9 @@ class InternEditScreen extends Screen
                 Input::make('intern.technology')
                     ->title('Technology')
                     ->placeholder('Enter technology'),
-            ]),
-            Layout::modal('exampleModal', [
-                Layout::rows([]),
-            ]),
+
+
+            ])
         ];
     }
 
@@ -141,7 +151,7 @@ class InternEditScreen extends Screen
      * @return \Illuminate\Http\RedirectResponse
      */
 
-    public function createOrUpdate(Interns $intern, Request $request)
+    public function createOrUpdate(Intern $intern, Request $request)
     {
         $data = $request->get('intern');
         //   $data['uid'] = (string) Str::uuid();
@@ -153,32 +163,33 @@ class InternEditScreen extends Screen
         return redirect()->route('platform.intern.list');
     }
 
-    public function qrgenerate(Interns $intern)
+    public function qrgenerate(Intern $intern)
     {
 
         // if ($intern->qr_path != null) {
         //     return Storage::download($intern->qr_path);
         // }
         QrCode::size(800)
-            ->format('svg')
-            ->generate('https://cert.iotronlabs.com/intern/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.svg');
-        // if (Storage::disk('public')->exists('qrcodes/' . $intern->uid . '.svg')) {
+            ->format('png')
+            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
+        // if (Storage::disk('public')->exists('qrcodes/' . $intern->uid . '.png')) {
         //     dd($intern);
         // }
-        //   $intern->setAttribute('Qrcode', 'images/qrcode' . $intern->uid . '.svg');
-        $path = public_path('storage/qrcodes/' . $intern->uid . '.svg');
+        //   $intern->setAttribute('Qrcode', 'images/qrcode' . $intern->uid . '.png');
+        // $path = public_path('storage/qrcodes/' . $intern->uid . '.png');
 
-        $file = Storage::disk('public')->get('qrcodes/' . $intern->uid . '.svg');
-        $intern->update([
-            'qr_path' => $path
-            //  asset('storage/qrcodes/' . $intern->uid . '.svg')
-        ]);
+        //  $file = Storage::disk('public')->get('qrcodes/' . $intern->uid . '.png');
+        // $intern->update([
+        //     'qr_path' => $path
+        //     //  asset('storage/qrcodes/' . $intern->uid . '.png')
+        // ]);
         $headers = [
 
-            'Content-Type' =>  'image/svg',
+            'Content-Type' =>  'image/png',
 
         ];
-        return response()->download($path, $intern->uid . '.svg', $headers);
+
+        return response()->download(storage_path('app/public/qrcodes/' . $intern->uid . '.png'));
         //FacadesAlert::info('Done');
     }
 
@@ -189,7 +200,7 @@ class InternEditScreen extends Screen
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function remove(Interns $intern)
+    public function remove(Intern $intern)
     {
         $intern->delete();
         FacadesAlert::info('You have successfully deleted the intern.');

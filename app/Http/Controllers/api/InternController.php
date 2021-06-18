@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Interns;
+use App\Models\Intern;
+
 use Illuminate\Http\Request;
 
 class InternController extends Controller
@@ -45,9 +46,9 @@ class InternController extends Controller
      * @param  \App\Models\Interns  $interns
      * @return \Illuminate\Http\Response
      */
-    public function show(Interns $interns)
+    public function show(Intern $intern)
     {
-        return $interns;
+        return $intern;
     }
 
     /**
@@ -56,9 +57,9 @@ class InternController extends Controller
      * @param  \App\Models\Interns  $interns
      * @return \Illuminate\Http\Response
      */
-    public function edit(Interns $interns)
+    public function getQR(Intern $intern)
     {
-        //
+        return response()->download(storage_path('app/public/qrcodes/' . $intern->uid . '.svg'));
     }
 
     /**
@@ -68,10 +69,7 @@ class InternController extends Controller
      * @param  \App\Models\Interns  $interns
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Interns $interns)
-    {
-        //
-    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -79,8 +77,4 @@ class InternController extends Controller
      * @param  \App\Models\Interns  $interns
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Interns $interns)
-    {
-        //
-    }
 }

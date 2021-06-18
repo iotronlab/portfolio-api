@@ -2,7 +2,8 @@
 
 namespace App\Orchid\Layouts;
 
-use App\Models\Interns;
+use App\Models\Intern;
+
 use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
@@ -28,7 +29,7 @@ class InternListLayout extends Table
     {
         return [
             TD::make('name', 'Name')
-                ->render(function (Interns $intern) {
+                ->render(function (Intern $intern) {
                     return Link::make($intern->name)
                         ->route('platform.intern.edit', $intern);
                 }),
