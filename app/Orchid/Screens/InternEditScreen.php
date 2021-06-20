@@ -40,6 +40,7 @@ class InternEditScreen extends Screen
      * @var string|null
      */
     public $description = 'Add a new intern';
+    public $uid = null;
 
     /**
      * Query data.
@@ -53,6 +54,7 @@ class InternEditScreen extends Screen
         if ($this->exists) {
             $this->name = 'Edit Intern';
             $this->description = 'Edit Intern';
+            $this->uid = $intern->uid;
         }
 
         return [
@@ -89,7 +91,7 @@ class InternEditScreen extends Screen
                 ->canSee($this->exists),
             Link::make('Download Qr-code')
                 ->icon('barcode')
-                ->route('getQR', 'KIIT1234')
+                ->route('getQR', $this->uid)
                 ->canSee($this->exists),
         ];
     }
@@ -154,9 +156,10 @@ class InternEditScreen extends Screen
     public function createOrUpdate(Intern $intern, Request $request)
     {
         $data = $request->get('intern');
-        //   $data['uid'] = (string) Str::uuid();
-        // dd($data);
+
         $intern->fill($data)->save();
+
+
 
         FacadesAlert::info('You have successfully created an intern.');
 
@@ -165,13 +168,13 @@ class InternEditScreen extends Screen
 
     public function qrgenerate(Intern $intern)
     {
+        QrCode::format('png')->mergeString(Storage::get('logo.png'), .3)->size(100)->errorCorrection('H')
+            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
         // if ($intern->qr_path != null) {
         //     return Storage::download($intern->qr_path);
         // }
-        QrCode::size(800)
-            ->format('png')
-            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
+
         // if (Storage::disk('public')->exists('qrcodes/' . $intern->uid . '.png')) {
         //     dd($intern);
         // }
