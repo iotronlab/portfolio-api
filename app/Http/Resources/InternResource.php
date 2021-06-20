@@ -14,6 +14,15 @@ class InternResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'uid' => $this->uid,
+            'name' => $this->name,
+            'email' => $this->email,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'duration' => $this->duration,
+            'projects' => $this->projects,
+            'technology' => $this->technology
+        ];
     }
 }

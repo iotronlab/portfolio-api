@@ -158,8 +158,8 @@ class InternEditScreen extends Screen
         $data = $request->get('intern');
 
         $intern->fill($data)->save();
-
-
+        QrCode::format('png')->mergeString(Storage::get('logo.png'), .3)->size(100)->errorCorrection('H')
+            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
         FacadesAlert::info('You have successfully created an intern.');
 
@@ -168,8 +168,9 @@ class InternEditScreen extends Screen
 
     public function qrgenerate(Intern $intern)
     {
-        QrCode::format('png')->mergeString(Storage::get('logo.png'), .3)->size(100)->errorCorrection('H')
-            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
+
+        //  phpinfo();
+
 
         // if ($intern->qr_path != null) {
         //     return Storage::download($intern->qr_path);
