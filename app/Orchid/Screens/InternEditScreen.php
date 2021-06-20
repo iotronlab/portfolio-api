@@ -2,11 +2,14 @@
 
 namespace App\Orchid\Screens;
 
+use App\Http\Controllers\api\InternController;
 use App\Models\Intern;
 use App\Models\Interns;
 use App\View\Components\internQR;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Orchid\Alert\Alert;
 use Orchid\Screen\Actions\Button;
@@ -40,7 +43,7 @@ class InternEditScreen extends Screen
      * @var string|null
      */
     public $description = 'Add a new intern';
-    public $uid = null;
+    public $qr_uid = null;
 
     /**
      * Query data.
@@ -54,7 +57,7 @@ class InternEditScreen extends Screen
         if ($this->exists) {
             $this->name = 'Edit Intern';
             $this->description = 'Edit Intern';
-            $this->uid = $intern->uid;
+            $this->qr_uid = $intern->uid;
         }
 
         return [
@@ -89,10 +92,10 @@ class InternEditScreen extends Screen
                 ->icon('barcode')
                 ->method('qrgenerate')
                 ->canSee($this->exists),
-            Link::make('Download Qr-code')
-                ->icon('barcode')
-                ->route('getQR', $this->uid)
-                ->canSee($this->exists),
+            // Link::make('Download Qr-code')
+            //     ->icon('barcode')
+            //     ->canSee($this->exists)
+            //     ->route('getQR', $this->uid),
         ];
     }
 
@@ -140,6 +143,10 @@ class InternEditScreen extends Screen
                 Input::make('intern.technology')
                     ->title('Technology')
                     ->placeholder('Enter technology'),
+                Link::make('Download Qr-code')
+                    ->icon('barcode')
+                    ->canSee($this->exists)
+                // ->route('getQR', $this->qr_uid),
 
 
             ])
@@ -158,8 +165,6 @@ class InternEditScreen extends Screen
         $data = $request->get('intern');
 
         $intern->fill($data)->save();
-        QrCode::format('png')->mergeString(Storage::get('logo.png'), .3)->size(100)->errorCorrection('H')
-            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
         FacadesAlert::info('You have successfully created an intern.');
 
@@ -169,8 +174,10 @@ class InternEditScreen extends Screen
     public function qrgenerate(Intern $intern)
     {
 
-        //  phpinfo();
-
+        QrCode::format('png')
+            ->mergeString(Storage::get('public/logo.png'), .3)
+            ->size(500)->errorCorrection('H')
+            ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
         // if ($intern->qr_path != null) {
         //     return Storage::download($intern->qr_path);
@@ -180,24 +187,27 @@ class InternEditScreen extends Screen
         //     dd($intern);
         // }
         //   $intern->setAttribute('Qrcode', 'images/qrcode' . $intern->uid . '.png');
-        // $path = public_path('storage/qrcodes/' . $intern->uid . '.png');
+        //  $path = storage_path('app/public/qrcodes/' . $intern->uid . '.svg');
 
         //  $file = Storage::disk('public')->get('qrcodes/' . $intern->uid . '.png');
         // $intern->update([
         //     'qr_path' => $path
         //     //  asset('storage/qrcodes/' . $intern->uid . '.png')
         // ]);
-        $headers = [
 
-            'Content-Type' =>  'image/png',
+        // $headers = array('Content-Type' => File::mimeType($path));
 
-        ];
-
-        return response()->download(storage_path('app/public/qrcodes/' . $intern->uid . '.png'));
+        // return response()->download($path, $filename, $headers);
+        // return response()->download($path, $intern->uid . '.svg', $headers);
         //FacadesAlert::info('Done');
+        $this->downloadQR($intern);
     }
 
-
+    public function downloadQR(Intern $intern)
+    {
+        // dd($intern);
+        return response()->download(storage_path('app/public/qrcodes/' . $intern->uid . '.png'));
+    }
     /**
      * @param Interns $intern
      *
