@@ -143,9 +143,9 @@ class InternEditScreen extends Screen
                 Input::make('intern.technology')
                     ->title('Technology')
                     ->placeholder('Enter technology'),
-                Link::make('Download Qr-code')
-                    ->icon('barcode')
-                    ->canSee($this->exists)
+                // Link::make('Download Qr-code')
+                //     ->icon('barcode')
+                //     ->canSee($this->exists)
                 // ->route('getQR', $this->qr_uid),
 
 
@@ -175,7 +175,7 @@ class InternEditScreen extends Screen
     {
 
         QrCode::format('png')
-            ->mergeString(Storage::get('public/logo.png'), .3)
+            ->mergeString(Storage::get('public/logo.jpg'), .3)
             ->size(500)->errorCorrection('H')
             ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
