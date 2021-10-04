@@ -12,6 +12,8 @@ use App\Orchid\Screens\Examples\ExampleTextEditorsScreen;
 use App\Orchid\Screens\InternEditScreen;
 use App\Orchid\Screens\InternListScreen;
 use App\Orchid\Screens\PlatformScreen;
+use App\Orchid\Screens\Portfolio\PortfolioEditScreen;
+use App\Orchid\Screens\Portfolio\PortfolioListScreen;
 use App\Orchid\Screens\Role\RoleEditScreen;
 use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
@@ -116,3 +118,8 @@ Route::screen('intern/{intern?}', InternEditScreen::class)
 
 Route::screen('interns', InternListScreen::class)
     ->name('platform.intern.list');
+
+Route::screen('portfolios', PortfolioListScreen::class)->name('platform.portfolio.list');
+
+Route::screen('portfolio/{portfolio?}', PortfolioEditScreen::class)
+    ->name('platform.portfolio.edit');

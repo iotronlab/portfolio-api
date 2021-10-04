@@ -179,34 +179,13 @@ class InternEditScreen extends Screen
             ->size(500)->errorCorrection('H')
             ->generate('https://www.iotron.co/verify/' . $intern->uid, '../public/storage/qrcodes/' . $intern->uid . '.png');
 
-        // if ($intern->qr_path != null) {
-        //     return Storage::download($intern->qr_path);
-        // }
-
-        // if (Storage::disk('public')->exists('qrcodes/' . $intern->uid . '.png')) {
-        //     dd($intern);
-        // }
-        //   $intern->setAttribute('Qrcode', 'images/qrcode' . $intern->uid . '.png');
-        //  $path = storage_path('app/public/qrcodes/' . $intern->uid . '.svg');
-
-        //  $file = Storage::disk('public')->get('qrcodes/' . $intern->uid . '.png');
-        // $intern->update([
-        //     'qr_path' => $path
-        //     //  asset('storage/qrcodes/' . $intern->uid . '.png')
-        // ]);
-
-        // $headers = array('Content-Type' => File::mimeType($path));
-
-        // return response()->download($path, $filename, $headers);
-        // return response()->download($path, $intern->uid . '.svg', $headers);
-        //FacadesAlert::info('Done');
         $this->downloadQR($intern);
     }
 
     public function downloadQR(Intern $intern)
     {
         // dd($intern);
-        return response()->download(storage_path('app/public/qrcodes/' . $intern->uid . '.png'));
+        return response()->streamDownload(storage_path('app/public/qrcodes/' . $intern->uid . '.png'));
     }
     /**
      * @param Interns $intern
